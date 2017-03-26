@@ -194,7 +194,7 @@ namespace PhysicsEngine
 			}
 	};
 
-	class Wedge : public DynamicActor
+	/*class Wedge : public DynamicActor
 	{
 		public:
 			Wedge(PxTransform pose = PxTransform(PxIdentity), PxReal density = 1.f, PxVec3 scale = PxVec3(1.f))
@@ -210,7 +210,7 @@ namespace PhysicsEngine
 
 				CreateShape(PxConvexMeshGeometry(ConvexMesh::CookMesh(vector<PxVec3>(&wedge_verts[0], &wedge_verts[6]))), density);
 			}
-	};
+	};*/
 }
 
 #endif

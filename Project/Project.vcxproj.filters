@@ -72,6 +72,9 @@
     <ClInclude Include="Extras\MaterialLibrary.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
+    <ClInclude Include="Actors\CompoundActors.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhysicsEngine.cpp">
