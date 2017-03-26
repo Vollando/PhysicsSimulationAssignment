@@ -17,24 +17,26 @@ namespace PhysicsEngine
 				joint = (PxJoint*)PxDistanceJointCreate(*GetPhysics(), px_actor0, localFrame0, (PxRigidActor*)actor1->Get(), localFrame1);
 				joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
 				((PxDistanceJoint*)joint)->setDistanceJointFlag(PxDistanceJointFlag::eSPRING_ENABLED, true);
-				damping(1.f);
-				stiffness(1.f);
+				Damping(1.f);
+				Stiffness(1.f);
 			}
 
-			void stiffness(PxReal value)
+			void Stiffness(PxReal value)
 			{
 				((PxDistanceJoint*)joint)->setStiffness(value);
 			}
-			PxReal stiffness()
+
+			PxReal Stiffness()
 			{
 				return ((PxDistanceJoint*)joint)->getStiffness();
 			}
 
-			void damping(PxReal value)
+			void Damping(PxReal value)
 			{
 				((PxDistanceJoint*)joint)->setDamping(value);
 			}
-			PxReal damping()
+
+			PxReal Damping()
 			{
 				return ((PxDistanceJoint*)joint)->getDamping();
 			}
@@ -42,8 +44,8 @@ namespace PhysicsEngine
 
 	class RevoluteJoint : public Joint
 	{
-		Actor* pivot;
-		Actor* actor;
+		//Actor* pivot;
+		//Actor* actor;
 
 		public:
 			RevoluteJoint(Actor* actor0, const PxTransform& localFrame0, Actor* actor1, const PxTransform& localFrame1)
@@ -56,8 +58,9 @@ namespace PhysicsEngine
 				joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
 			}
 
-			void driveVelocity(PxReal value)
+			void DriveVelocity(PxReal value)
 			{
+				//wake up the attached actors
 				PxRigidDynamic *actor_0, *actor_1;
 				((PxRevoluteJoint*)joint)->getActors((PxRigidActor*&)actor_0, (PxRigidActor*&)actor_1);
 				if (actor_0)
@@ -73,7 +76,8 @@ namespace PhysicsEngine
 				((PxRevoluteJoint*)joint)->setDriveVelocity(value);
 				((PxRevoluteJoint*)joint)->setRevoluteJointFlag(PxRevoluteJointFlag::eDRIVE_ENABLED, true);
 			}
-			PxReal driveVelocity()
+
+			PxReal DriveVelocity()
 			{
 				return ((PxRevoluteJoint*)joint)->getDriveVelocity();
 			}
