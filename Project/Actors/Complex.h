@@ -9,13 +9,9 @@ namespace PhysicsEngine
 	class ConvexMesh : public DynamicActor
 	{
 		public:
+			//constructor
 			ConvexMesh(const std::vector<PxVec3>& verts, const PxTransform& pose = PxTransform(PxIdentity), PxReal density = 1.f)
 				: DynamicActor(pose)
-			{
-				CreateShape(PxConvexMeshGeometry(CookMesh(verts)), density);
-			}
-
-			static PxConvexMesh* CookMesh(const std::vector<PxVec3>& verts, PxU16 vertexLimit = 256, PxConvexFlags flag = PxConvexFlag::eCOMPUTE_CONVEX)
 			{
 				PxConvexMeshDesc mesh_desc;
 				mesh_desc.points.count = (PxU32)verts.size();
@@ -24,6 +20,12 @@ namespace PhysicsEngine
 				mesh_desc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
 				mesh_desc.vertexLimit = 256;
 
+				CreateShape(PxConvexMeshGeometry(CookMesh(mesh_desc)), density);
+			}
+
+			//mesh cooking (preparation)
+			PxConvexMesh* CookMesh(const PxConvexMeshDesc& mesh_desc)
+			{
 				PxDefaultMemoryOutputStream stream;
 
 				if (!GetCooking()->cookConvexMesh(mesh_desc, stream))
@@ -37,32 +39,33 @@ namespace PhysicsEngine
 
 	class TriangleMesh : public StaticActor
 	{
-		public:
-			TriangleMesh(const std::vector<PxVec3>& verts, const std::vector<PxU32>& trigs, const PxTransform& pose = PxTransform(PxIdentity))
-				: StaticActor(pose)
-			{
-				PxTriangleMeshDesc mesh_desc;
-				mesh_desc.points.count = (PxU32)verts.size();
-				mesh_desc.points.stride = sizeof(PxVec3);
-				mesh_desc.points.data = &verts.front();
-				mesh_desc.triangles.count = (PxU32)trigs.size();
-				mesh_desc.triangles.stride = 3 * sizeof(PxU32);
-				mesh_desc.triangles.data = &trigs.front();
+		//constructor
+		TriangleMesh(const std::vector<PxVec3>& verts, const std::vector<PxU32>& trigs, const PxTransform& pose = PxTransform(PxIdentity))
+			: StaticActor(pose)
+		{
+			PxTriangleMeshDesc mesh_desc;
+			mesh_desc.points.count = (PxU32)verts.size();
+			mesh_desc.points.stride = sizeof(PxVec3);
+			mesh_desc.points.data = &verts.front();
+			mesh_desc.triangles.count = (PxU32)trigs.size();
+			mesh_desc.triangles.stride = 3 * sizeof(PxU32);
+			mesh_desc.triangles.data = &trigs.front();
 
-				CreateShape(PxTriangleMeshGeometry(CookMesh(mesh_desc)));
-			}
+			CreateShape(PxTriangleMeshGeometry(CookMesh(mesh_desc)));
+		}
 
-			static PxTriangleMesh* CookMesh(const PxTriangleMeshDesc& mesh_desc)
-			{
-				PxDefaultMemoryOutputStream stream;
+		//mesh cooking (preparation)
+		PxTriangleMesh* CookMesh(const PxTriangleMeshDesc& mesh_desc)
+		{
+			PxDefaultMemoryOutputStream stream;
 
-				if (!GetCooking()->cookTriangleMesh(mesh_desc, stream))
-					throw new Exception("TriangleMesh::CookMesh, cooking failed.");
+			if (!GetCooking()->cookTriangleMesh(mesh_desc, stream))
+				throw new Exception("TriangleMesh::CookMesh, cooking failed.");
 
-				PxDefaultMemoryInputData input(stream.getData(), stream.getSize());
+			PxDefaultMemoryInputData input(stream.getData(), stream.getSize());
 
-				return GetPhysics()->createTriangleMesh(input);
-			}
+			return GetPhysics()->createTriangleMesh(input);
+		}
 	};
 
 	class Polygon : public StaticActor

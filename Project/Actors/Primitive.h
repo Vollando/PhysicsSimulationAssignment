@@ -18,7 +18,7 @@ namespace PhysicsEngine
 	class Sphere : public DynamicActor
 	{
 		public:
-			Sphere(const PxTransform& pose = PxTransform(PxIdentity), PxReal radius = 1.f, PxReal density = 1.f)
+			Sphere(const PxTransform& pose = PxTransform(PxIdentity), PxReal radius = 1.f, PxReal density = 1.2f)
 				: DynamicActor(pose)
 			{
 				CreateShape(PxSphereGeometry(radius), density);
