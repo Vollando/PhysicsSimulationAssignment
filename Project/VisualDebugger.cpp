@@ -113,7 +113,7 @@ namespace VisualDebugger
 
 		switch (toupper(key))
 		{
-			case 'I': scene->GetSelectedActor()->addForce(PxVec3(0,0,-1)*gForceStrength);
+			case 'I': scene->GetSelectedActor()->addForce(PxVec3(0,0,-0.1)*gForceStrength);
 				break;
 			case 'K': scene->GetSelectedActor()->addForce(PxVec3(0,0,1)*gForceStrength);
 				break;

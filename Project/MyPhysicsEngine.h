@@ -136,12 +136,12 @@ namespace PhysicsEngine
 				platform->Materials(MaterialLibrary::Instance().New("wood", 0.125f, 0.f, 0.603f));
 				Add(platform);
 
-				ball = new Sphere(platform->RelativeTransform(PxVec2(.3f, .9f)), .1f, 1.f);
+				ball = new Sphere(platform->RelativeTransform(PxVec2(.9f, .9f)), .1f, 1.f);
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				Add(ball);
 
-				plunger = new Plunger(PxTransform(PxVec3(.0f, 7.f, .0f), Mathv::EulerToQuat(0, 0, -PxPi / 4.f)), PxVec3(.24f), .05f, 100.f, 1.f);
+				plunger = new Plunger(PxTransform(PxVec3(3.1, 7.f, .0f), Mathv::EulerToQuat(0, 0, -PxPi / 4.f)), PxVec3(.24f), .05f, 100.f, 1.f);
 				plunger->AddToScene(this);
 
 				flipperL = new Flipper(this, PxVec3(-1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, PxHalfPi), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
