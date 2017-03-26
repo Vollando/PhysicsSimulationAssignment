@@ -13,6 +13,8 @@ namespace PhysicsEngine
 	static const PxVec3 color_palette[] = {PxVec3(46.f/255.f,9.f/255.f,39.f/255.f),PxVec3(217.f/255.f,0.f/255.f,0.f/255.f),
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f)};
 
+	static int score = 0;
+
 	struct FilterGroup
 	{
 		enum Enum
@@ -57,14 +59,14 @@ namespace PhysicsEngine
 
 			for (PxU32 i = 0; i < nbPairs; i++)
 			{
-				if (pairs[i].events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+				switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
 				{
-					cerr << "onContact::eNOTIFY_TOUCH_FOUND" << endl;
-				}
-
-				if (pairs[i].events & PxPairFlag::eNOTIFY_TOUCH_LOST)
-				{
-					cerr << "onContact::eNOTIFY_TOUCH_LOST" << endl;
+				case FilterGroup::ACTOR0:
+					score += 10;
+					break;
+				case FilterGroup::ACTOR1:
+					score += 10;
+					break;
 				}
 			}
 		}
@@ -136,7 +138,7 @@ namespace PhysicsEngine
 				platform->Materials(MaterialLibrary::Instance().New("wood", 0.125f, 0.f, 0.603f));
 				Add(platform);
 
-				ball = new Sphere(platform->RelativeTransform(PxVec2(.9f, .9f)), .1f, 1.f);
+				ball = new Sphere(platform->RelativeTransform(PxVec2(.3f, .9f)), .1f, 1.f);
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				Add(ball);
@@ -150,6 +152,11 @@ namespace PhysicsEngine
 
 			virtual void CustomUpdate() 
 			{
+			}
+
+			virtual int GetScore()
+			{
+				return score;
 			}
 
 			void Hit()

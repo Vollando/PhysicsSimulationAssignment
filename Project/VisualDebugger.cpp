@@ -43,6 +43,8 @@ namespace VisualDebugger
 		hud.AddLine(EMPTY, "");
 		AddHUD(HELP, "../Assets/help_hud.txt");
 		AddHUD(PAUSE, "../Assets/paused_hud.txt");
+		hud.AddLine(EMPTY, "");
+		hud.AddLine(HELP, "SCORE:");
 
 		hud.FontSize(0.018f);
 		hud.Color(PxVec3(0.f,0.f,0.f));
@@ -68,6 +70,9 @@ namespace VisualDebugger
 			if (actors.size())
 				Renderer::Render(&actors[0], (PxU32)actors.size());
 		}
+
+		int score = scene->GetScore();
+		hud.AmendLine(HELP, to_string(score));
 
 		if (hud_show)
 		{
@@ -179,7 +184,7 @@ namespace VisualDebugger
 			break;
 		case GLUT_KEY_F10: scene->Pause(!scene->Pause());
 			break;
-		case GLUT_KEY_F12: scene->Reset();
+		case GLUT_KEY_HOME: scene->Reset();
 			break;
 		default:
 			break;

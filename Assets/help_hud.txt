@@ -1,7 +1,7 @@
  Simulation
     F9 - select next actor
     F10 - pause
-    F12 - reset
+    Home Key - reset
 
  Display
     F5 - help on/off

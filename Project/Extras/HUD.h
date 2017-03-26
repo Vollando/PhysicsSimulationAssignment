@@ -28,6 +28,11 @@ namespace VisualDebugger
 			content.push_back(line);
 		}
 
+		void AmendLine(string line)
+		{
+			content[content.size() - 1] = line;
+		}
+
 		void Render()
 		{
 			for (unsigned int i = 0; i < content.size(); i++)
@@ -65,6 +70,18 @@ namespace VisualDebugger
 
 			screens.push_back(new HUDScreen(screen_id));
 			screens.back()->AddLine(line);
+		}
+
+		void AmendLine(int screen_id, string line)
+		{
+			for (unsigned int i = 0; i < screens.size(); i++)
+			{
+				if (screens[i]->id == screen_id)
+				{
+					screens[i]->AmendLine(line);
+					return;
+				}
+			}
 		}
 
 		void ActiveScreen(int value)
