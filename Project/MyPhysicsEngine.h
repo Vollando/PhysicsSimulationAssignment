@@ -4,7 +4,6 @@
 #include <iostream>
 #include <iomanip>
 #include "Actors/Actors.h"
-#include "Actors/CompoundActors.h"
 #include "Extras/MaterialLibrary.h"
 
 namespace PhysicsEngine

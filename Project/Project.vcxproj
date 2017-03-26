@@ -130,7 +130,6 @@
   <ItemGroup>
     <ClInclude Include="Actors\Actors.h" />
     <ClInclude Include="Actors\Complex.h" />
-    <ClInclude Include="Actors\CompoundActors.h" />
     <ClInclude Include="Actors\Joints.h" />
     <ClInclude Include="Actors\Primitive.h" />
     <ClInclude Include="Exception.h" />
