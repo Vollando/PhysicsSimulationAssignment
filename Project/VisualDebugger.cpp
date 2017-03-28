@@ -57,6 +57,10 @@ namespace VisualDebugger
 
 	void RenderScene()
 	{
+
+		if (scene->ball != nullptr)
+			camera->setEye(((PxRigidDynamic*)scene->ball->Get())->getGlobalPose().p);
+
 		KeyHold();
 
 		Renderer::Start(camera->getEye(), camera->getDir());
