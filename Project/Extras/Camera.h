@@ -30,6 +30,8 @@ namespace VisualDebugger
 		void MoveUp(PxReal delta_time);
 		void MoveDown(PxReal delta_time);
 
+		void setEye(PxVec3 pos);
+
 		PxVec3 getEye() const;
 		PxVec3 getDir() const;
 		PxTransform	getTransform() const;

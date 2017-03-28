@@ -13,7 +13,7 @@ namespace PhysicsEngine
 	static const PxVec3 color_palette[] = {PxVec3(46.f/255.f,9.f/255.f,39.f/255.f),PxVec3(217.f/255.f,0.f/255.f,0.f/255.f),
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f)};
 
-	static int score = 0;
+	int static score = 0;
 
 	struct FilterGroup
 	{
@@ -61,11 +61,11 @@ namespace PhysicsEngine
 			{
 				switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
 				{
-				case FilterGroup::ACTOR0:
-					score += 10;
-					break;
 				case FilterGroup::ACTOR1:
 					score += 10;
+					break;
+				case FilterGroup::ACTOR2:
+					score += 5;
 					break;
 				}
 			}
@@ -106,12 +106,12 @@ namespace PhysicsEngine
 		Platform *platform;
 		Flipper *flipperL;
 		Flipper *flipperR;
-		Sphere *ball;
 		Plunger *plunger;
 		MySimulationEventCallback *my_callback;
 		
 		public:
-			MyScene() : Scene() {};
+			Sphere *ball;
+			MyScene() : Scene(CustomFilterShader) {};
 
 			void SetVisualisation()
 			{
@@ -142,6 +142,8 @@ namespace PhysicsEngine
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				Add(ball);
+				ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
+				ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR2);
 
 				plunger = new Plunger(PxTransform(PxVec3(3.1, 7.f, .0f), Mathv::EulerToQuat(0, 0, -PxPi / 4.f)), PxVec3(.24f), .05f, 100.f, 1.f);
 				plunger->AddToScene(this);
@@ -157,6 +159,7 @@ namespace PhysicsEngine
 			virtual int GetScore()
 			{
 				return score;
+				std::cout << score << endl;
 			}
 
 			void Hit()
