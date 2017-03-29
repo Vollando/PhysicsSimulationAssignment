@@ -126,16 +126,6 @@ namespace PhysicsEngine
 			//check all pairs
 			for (PxU32 i = 0; i < nbPairs; i++)
 			{
-				////check eNOTIFY_TOUCH_FOUND
-				//if (pairs[i].events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
-				//{
-				//	cerr << "onContact::eNOTIFY_TOUCH_FOUND" << endl;
-				//}
-				////check eNOTIFY_TOUCH_LOST
-				//if (pairs[i].events & PxPairFlag::eNOTIFY_TOUCH_LOST)
-				//{
-				//	cerr << "onContact::eNOTIFY_TOUCH_LOST" << endl;
-				//}
 				switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
 				{
 				case FilterGroup::ACTOR0:
@@ -194,17 +184,20 @@ namespace PhysicsEngine
 	class MyScene : public Scene
 	{
 		MySimulationEventCallback* my_callback;
+
 		Plane* plane;
 		Box* base;
 		
 		Walls *walls;
 
-		Trampoline *plunger;
+		Trampoline *launcher;
+
 		DistanceJoint *spring;
+
 		bool pullSpring = false;
 		float springStr = 0.0f;
 
-		Wedge *padL, *padR;
+		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
 
 
@@ -267,26 +260,26 @@ namespace PhysicsEngine
 			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR2);
 
 			// actor 4 left paddle
-			padL = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, -5.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
-			padL->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
-			padL->mesh->SetKinematic(false); 
-			Add(padL->mesh);
-			LPjoint = new RevoluteJoint(base, PxTransform(PxVec3(-12.f, 1.f, -5.f), PxQuat(PxPi/2, PxVec3(0.f, 0.f, 1.f))), padL->mesh, PxTransform(PxVec3(0.5f, 0.f, 0.5f), PxQuat(PxPi / 2, PxVec3(0.0f, 0.0f, 1.0f))));
+			leftPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, -5.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
+			leftPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
+			leftPaddle->mesh->SetKinematic(false); 
+			Add(leftPaddle->mesh);
+			LPjoint = new RevoluteJoint(base, PxTransform(PxVec3(-12.f, 1.f, -5.f), PxQuat(PxPi/2, PxVec3(0.f, 0.f, 1.f))), leftPaddle->mesh, PxTransform(PxVec3(0.5f, 0.f, 0.5f), PxQuat(PxPi / 2, PxVec3(0.0f, 0.0f, 1.0f))));
 			LPjoint->SetLimits(-PxPi/6, PxPi/6);
-			padL->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+			leftPaddle->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 5 right paddle
-			padR = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, 5.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))));
-			padR->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
-			padR->mesh->SetKinematic(false);
-			Add(padR->mesh);
-			RPjoint = new RevoluteJoint(base, PxTransform(PxVec3(-12.f, 0.5f, 5.f), PxQuat(PxPi / 2, PxVec3(0.f, 0.f, 1.f))), padR->mesh, PxTransform(PxVec3(0.5f, 0.f, -0.5f), PxQuat(PxPi / 2, PxVec3(0.0f, 0.0f, 1.0f))));
+			rightPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, 5.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))));
+			rightPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
+			rightPaddle->mesh->SetKinematic(false);
+			Add(rightPaddle->mesh);
+			RPjoint = new RevoluteJoint(base, PxTransform(PxVec3(-12.f, 0.5f, 5.f), PxQuat(PxPi / 2, PxVec3(0.f, 0.f, 1.f))), rightPaddle->mesh, PxTransform(PxVec3(0.5f, 0.f, -0.5f), PxQuat(PxPi / 2, PxVec3(0.0f, 0.0f, 1.0f))));
 			RPjoint->SetLimits(-PxPi/6, PxPi / 6);
-			padR->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+			rightPaddle->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 6 and 7 bottom and top respective plunger components
-			plunger = new Trampoline(PxVec3(.5f, 0.5f, 0.5f), 100.0f, 10.0f, PxTransform(PxVec3(-12.0f, 6.0f, 9.0f), PxQuat(-tableAngle*2, PxVec3(0.0f, 0.0f, 1.0f))), PxTransform(PxVec3(-12.0f, 6.0f, 9.0f), PxQuat(-tableAngle*2, PxVec3(0.0f, 0.0f, 1.0f))));
-			plunger->AddToScene(this);
+			launcher = new Trampoline(PxVec3(.5f, 0.5f, 0.5f), 100.0f, 10.0f, PxTransform(PxVec3(-12.0f, 6.0f, 9.0f), PxQuat(-tableAngle*2, PxVec3(0.0f, 0.0f, 1.0f))), PxTransform(PxVec3(-12.0f, 6.0f, 9.0f), PxQuat(-tableAngle*2, PxVec3(0.0f, 0.0f, 1.0f))));
+			launcher->AddToScene(this);
 
 			walls = new Walls(PxTransform(PxVec3(PxIdentity), PxQuat(PxPi/6, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(20.0f, 2.0f, 0.5f));
 			walls->GetShape(0)->setLocalPose(PxTransform(PxVec3(4.0f, 12.0f, 10.0f), PxQuat(PxIdentity)));
@@ -359,7 +352,6 @@ namespace PhysicsEngine
 		void KeyPressL()
 		{
 			pullSpring = true;
-			//plunger->top->SetKinematic(true);
 		}
 
 		void KeyReleaseL()
@@ -368,7 +360,6 @@ namespace PhysicsEngine
 			this->SelectActor(5);
 			this->GetSelectedActor()->addForce(PxVec3(2.0f, 1.0f, 0.0f) * springStr);			
 			springStr = 0.0f;
-			//plunger->top->SetKinematic(false);
 
 		}
 	};
