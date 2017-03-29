@@ -95,7 +95,7 @@ namespace VisualDebugger
 		hud.AddLine(HELP, " Simulation");
 		hud.AddLine(HELP, "    F9 - select next actor");
 		hud.AddLine(HELP, "    F10 - pause");
-		hud.AddLine(HELP, "    F1 - reset");
+		hud.AddLine(HELP, "    Home Key - reset");
 		hud.AddLine(HELP, "");
 		hud.AddLine(HELP, " Display");
 		hud.AddLine(HELP, "    F5 - help on/off");
@@ -294,7 +294,7 @@ namespace VisualDebugger
 			//toggle scene pause
 			scene->Pause(!scene->Pause());
 			break;
-		case GLUT_KEY_F1:
+		case GLUT_KEY_HOME:
 			//resect scene
 			scene->Reset();
 			break;
