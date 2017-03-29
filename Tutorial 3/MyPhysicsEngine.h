@@ -5,6 +5,8 @@
 #include <iostream>
 #include <iomanip>
 
+// Charlie Volland-Butler 14467072 University of Lincoln
+
 namespace PhysicsEngine
 {
 	using namespace std;
