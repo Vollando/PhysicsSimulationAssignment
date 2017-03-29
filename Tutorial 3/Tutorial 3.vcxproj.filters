@@ -14,16 +14,16 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Header Files\Extras">
-      <UniqueIdentifier>{0ac7a437-1730-413e-bc45-5d9be61f6e96}</UniqueIdentifier>
+      <UniqueIdentifier>{af8d1bb6-9547-40aa-b3cb-0f070aca512b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Extras">
-      <UniqueIdentifier>{4a4dc88f-e005-4c51-9735-3c1616005150}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Actors">
-      <UniqueIdentifier>{5efe21df-fe13-4566-a3ec-642641a6464d}</UniqueIdentifier>
+      <UniqueIdentifier>{164e283a-9191-4a4e-9f86-ce68e31030d5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicActors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -48,29 +48,14 @@
     <ClInclude Include="Extras\HUD.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
-    <ClInclude Include="Extras\UserData.h">
-      <Filter>Header Files\Extras</Filter>
-    </ClInclude>
     <ClInclude Include="Extras\Renderer.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
-    <ClInclude Include="Actors\Actors.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="Actors\Complex.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="Actors\Primitive.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="Actors\Joints.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="Extras\Helper.h">
+    <ClInclude Include="Extras\UserData.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
-    <ClInclude Include="Extras\MaterialLibrary.h">
-      <Filter>Header Files\Extras</Filter>
+    <ClInclude Include="CompoundActors.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -89,14 +74,8 @@
     <ClCompile Include="Extras\Renderer.cpp">
       <Filter>Source Files\Extras</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Tutorial 3.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extras\Helper.cpp">
-      <Filter>Source Files\Extras</Filter>
-    </ClCompile>
-    <ClCompile Include="Extras\MaterialLibrary.cpp">
-      <Filter>Source Files\Extras</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

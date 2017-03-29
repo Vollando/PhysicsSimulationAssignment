@@ -43,6 +43,11 @@ namespace VisualDebugger
 		return eye; 
 	}
 
+	void Camera::setEye(PxVec3 pos)
+	{
+		eye = pos;
+	}
+
 	PxVec3 Camera::getDir() const 
 	{ 
 		return dir; 
@@ -89,10 +94,5 @@ namespace VisualDebugger
 	void Camera::MoveDown(PxReal delta_time)
 	{
 		eye -= PxVec3(0,1,0)*speed*delta_time; 
-	}
-
-	void Camera::setEye(PxVec3 pos)
-	{
-		eye = pos;
 	}
 }

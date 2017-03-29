@@ -49,16 +49,19 @@ namespace VisualDebugger
 			const PxF32 radius = geometry.capsule().radius;
 			const PxF32 halfHeight = geometry.capsule().halfHeight;
 
+			//Sphere
 			glPushMatrix();
 			glTranslatef(halfHeight,0.f, 0.f);
 			glutSolidSphere(radius, render_detail, render_detail);		
 			glPopMatrix();
 
+			//Sphere
 			glPushMatrix();
 			glTranslatef(-halfHeight,0.f,0.f);
 			glutSolidSphere(radius, render_detail, render_detail);		
 			glPopMatrix();
 
+			//Cylinder
 			glPushMatrix();
 			glTranslatef(-halfHeight,0.f,0.f);
 			glRotatef(90.f,0.f,1.f,0.f);
@@ -120,7 +123,7 @@ namespace VisualDebugger
 
 		void DrawHeightField(const PxGeometryHolder& geometry)
 		{
-			
+			//TODO
 		}
 
 		void RenderGeometry(const PxGeometryHolder& geometry)
@@ -164,12 +167,13 @@ namespace VisualDebugger
 			std::vector<PxVec3> verts(cloth->getNbParticles());
 			std::vector<PxVec3> norms(verts.size(), PxVec3(0.f,0.f,0.f));
 
+			//get verts data
 			cloth->lockParticleData();
 
 			PxClothParticleData* particle_data = cloth->lockParticleData();
 			if (!particle_data)
 				return;
-
+			// copy vertex positions
 			for (PxU32 j = 0; j < verts.size(); j++)
 				verts[j] = particle_data->particles[j].pos;
 
@@ -244,6 +248,7 @@ namespace VisualDebugger
 
 		void Init()
 		{
+			// Setup default render states
 			PxReal specular_material[]	= { .1f, .1f, .1f, 1.f };
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_COLOR_MATERIAL);
@@ -251,9 +256,10 @@ namespace VisualDebugger
 			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 1.f);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_material);
 
+			// Setup lighting
 			glEnable(GL_LIGHTING);
-			PxReal ambientColor[]	= { .2f, .2f, .2f, 1.f };
-			PxReal diffuseColor[]	= { .7f, .7f, .7f, 1.f };		
+			PxReal ambientColor[]	= { 0.2f, 0.2f, 0.2f, 1.f };
+			PxReal diffuseColor[]	= { 0.7f, 0.7f, 0.7f, 1.f };		
 			PxReal position[]		= { 50.f, 50.f, 100.f, 0.f };		
 			glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
 			glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
@@ -265,6 +271,7 @@ namespace VisualDebugger
 		{
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			// Setup camera
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			gluPerspective(60.f, (float)glutGet(GLUT_WINDOW_WIDTH)/(float)glutGet(GLUT_WINDOW_HEIGHT), 1.f, 10000.f);
@@ -297,58 +304,55 @@ namespace VisualDebugger
 					for(PxU32 j = 0; j < shapes.size(); j++)
 					{
 						const PxShape* shape = shapes[j];
-
-						if (shape->getFlags().isSet(PxShapeFlag::eVISUALIZATION))
+						PxTransform pose = PxShapeExt::getGlobalPose(*shape, *shape->getActor());
+						PxGeometryHolder h = shape->getGeometry();
+						//move the plane slightly down to avoid visual artefacts
+						if (h.getType() == PxGeometryType::ePLANE)
 						{
-							PxTransform pose = PxShapeExt::getGlobalPose(*shape, *shape->getActor());
-							PxGeometryHolder h = shape->getGeometry();
+							pose.q *= PxQuat(PxHalfPi, PxVec3(0.f, 0.f, 1.f));
+							pose.p += PxVec3(0,-0.01,0);
+						}
+
+						PxMat44 shapePose(pose);
+						// render object
+						glPushMatrix();						
+						glMultMatrixf((float*)&shapePose);
+
+						PxVec3 shape_color = default_color;
+
+						if (shape->userData)
+						{
+							shape_color = *(((UserData*)shape->userData)->color);
 							if (h.getType() == PxGeometryType::ePLANE)
 							{
-								pose.q *= PxQuat(PxHalfPi, PxVec3(0.f, 0.f, 1.f));
-								pose.p += PxVec3(0, -0.01, 0);
+								shadow_color = shape_color*0.9;
 							}
+						}
 
-							PxMat44 shapePose(pose);
-							// render object
-							glPushMatrix();
+						if (h.getType() == PxGeometryType::ePLANE)
+							glDisable(GL_LIGHTING);
+
+						glColor4f(shape_color.x, shape_color.y, shape_color.z, 1.f);
+
+						RenderGeometry(h);
+
+						if (h.getType() == PxGeometryType::ePLANE)
+							glEnable(GL_LIGHTING);
+
+						glPopMatrix();
+
+						if(show_shadows && (h.getType() != PxGeometryType::ePLANE))
+						{
+							const PxVec3 shadowDir(-0.7071067f, -0.7071067f, -0.7071067f);
+							const PxReal shadowMat[]={ 1,0,0,0, -shadowDir.x/shadowDir.y,0,-shadowDir.z/shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
+							glPushMatrix();						
+							glMultMatrixf(shadowMat);
 							glMultMatrixf((float*)&shapePose);
-
-							PxVec3 shape_color = default_color;
-
-							if (shape->userData)
-							{
-								shape_color = *(((UserData*)shape->userData)->color);
-								if (h.getType() == PxGeometryType::ePLANE)
-								{
-									shadow_color = shape_color*0.9;
-								}
-							}
-
-							if (h.getType() == PxGeometryType::ePLANE)
-								glDisable(GL_LIGHTING);
-
-							glColor4f(shape_color.x, shape_color.y, shape_color.z, 1.f);
-
+							glDisable(GL_LIGHTING);
+							glColor4f(shadow_color.x, shadow_color.y, shadow_color.z, 1.f);
 							RenderGeometry(h);
-
-							if (h.getType() == PxGeometryType::ePLANE)
-								glEnable(GL_LIGHTING);
-
+							glEnable(GL_LIGHTING);
 							glPopMatrix();
-
-							if (show_shadows && (h.getType() != PxGeometryType::ePLANE))
-							{
-								const PxVec3 shadowDir(-0.7071067f, -0.7071067f, -0.7071067f);
-								const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
-								glPushMatrix();
-								glMultMatrixf(shadowMat);
-								glMultMatrixf((float*)&shapePose);
-								glDisable(GL_LIGHTING);
-								glColor4f(shadow_color.x, shadow_color.y, shadow_color.z, 1.f);
-								RenderGeometry(h);
-								glEnable(GL_LIGHTING);
-								glPopMatrix();
-							}
 						}
 					}
 				}
@@ -384,9 +388,13 @@ namespace VisualDebugger
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 
+		///Render PxRenderBuffer
+		///TODO: support text data
 		void Render(const PxRenderBuffer& data, PxReal line_width)
 		{
 			glLineWidth(line_width);
+
+			//render points
 
 			unsigned int NbPoints = data.getNbPoints();
 			if(NbPoints)
@@ -410,6 +418,8 @@ namespace VisualDebugger
 
 				RenderBuffer(&pVertList.front(), &pColorList.front(), GL_POINTS, data.getNbPoints());
 			}
+
+			//render lines
 
 			unsigned int NbLines = data.getNbLines();
 			if(NbLines)
@@ -442,6 +452,8 @@ namespace VisualDebugger
 
 				RenderBuffer(&pVertList.front(), &pColorList.front(), GL_LINES, data.getNbLines()*2);
 			}
+
+			//render triangles
 
 			unsigned int NbTris = data.getNbTriangles();
 			if(NbTris)
@@ -485,6 +497,8 @@ namespace VisualDebugger
 
 				RenderBuffer(&pVertList.front(), &pColorList.front(), GL_TRIANGLES, data.getNbTriangles()*3);
 			}
+
+			//TODO: render texts ?
 		}
 
 		void RenderText(const std::string& text, const physx::PxVec2& location, 

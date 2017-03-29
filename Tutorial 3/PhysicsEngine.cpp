@@ -6,28 +6,34 @@ namespace PhysicsEngine
 	using namespace physx;
 	using namespace std;
 
+	//default error and allocator callbacks
 	PxDefaultErrorCallback gDefaultErrorCallback;
 	PxDefaultAllocator gDefaultAllocatorCallback;
 
+	//PhysX objects
 	PxFoundation* foundation = 0;
 	debugger::comm::PvdConnection* vd_connection = 0;
 	PxPhysics* physics = 0;
 	PxCooking* cooking = 0;
 
+	///PhysX functions
 	void PxInit()
 	{
+		//foundation
 		if (!foundation)
 			foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
 
 		if(!foundation)
 			throw new Exception("PhysicsEngine::PxInit, Could not create the PhysX SDK foundation.");
 
+		//physics
 		if (!physics)
 			physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, PxTolerancesScale());
 
 		if(!physics)
 			throw new Exception("PhysicsEngine::PxInit, Could not initialise the PhysX SDK.");
 
+		//to enable extra remote debugging options
 		if (!PxInitExtensions(*physics))
 			throw new Exception("PhysicsEngine::PxInit, Could not initialise Extensions.");
 
@@ -37,10 +43,12 @@ namespace PhysicsEngine
 		if(!cooking)
 			throw new Exception("PhysicsEngine::PxInit, Could not initialise the cooking component.");
 
+		//visual debugger
 		if (!vd_connection)
 			vd_connection = PxVisualDebuggerExt::createConnection(physics->getPvdConnectionManager(), 
 			"localhost", 5425, 100, PxVisualDebuggerExt::getAllConnectionFlags());
 
+		//create a deafult material
 		CreateMaterial();
 	}
 
@@ -82,6 +90,9 @@ namespace PhysicsEngine
 		return physics->createMaterial(sf, df, cr);
 	}
 
+	///Actor methods
+
+	///Constructor
 	PxActor* Actor::Get()
 	{
 		return actor;
@@ -89,11 +100,13 @@ namespace PhysicsEngine
 
 	void Actor::Color(PxVec3 new_color, PxU32 shape_index)
 	{
+		//change color of all shapes
 		if (shape_index == -1)
 		{
 			for (unsigned int i = 0; i < colors.size(); i++)
 				colors[i] = new_color;
 		}
+		//or only the selected one
 		else if (shape_index < colors.size())
 		{
 			colors[shape_index] = new_color;
@@ -158,6 +171,10 @@ namespace PhysicsEngine
 		std::vector<PxShape*> shape_list = GetShapes(shape_index);
 		for (PxU32 i = 0; i < shape_list.size(); i++)
 			shape_list[i]->setSimulationFilterData(PxFilterData(filterGroup, filterMask,0,0));
+
+		// PxFilterData(word0, word1, 0, 0)
+		// word0 = own ID
+		// word1 = ID mask to filter pairs that trigger a contact callback
 	}
 
 	void Actor::Name(const string& new_name)
@@ -188,6 +205,7 @@ namespace PhysicsEngine
 		PxShape* shape = ((PxRigidDynamic*)actor)->createShape(geometry,*GetMaterial());
 		PxRigidBodyExt::updateMassAndInertia(*(PxRigidDynamic*)actor, density);
 		colors.push_back(default_color);
+		//pass the color pointers to the renderer
 		shape->userData = new UserData();
 		for (unsigned int i = 0; i < colors.size(); i++)
 			((UserData*)GetShape(i)->userData)->color = &colors[i];
@@ -214,6 +232,7 @@ namespace PhysicsEngine
 	{
 		PxShape* shape = ((PxRigidStatic*)actor)->createShape(geometry,*GetMaterial());
 		colors.push_back(default_color);
+		//pass the color pointers to the renderer
 		shape->userData = new UserData();
 		for (unsigned int i = 0; i < colors.size(); i++)
 			((UserData*)GetShape(i)->userData)->color = &colors[i];
@@ -222,6 +241,7 @@ namespace PhysicsEngine
 	///Scene methods
 	void Scene::Init()
 	{
+		//scene
 		PxSceneDesc sceneDesc(GetPhysics()->getTolerancesScale());
 
 		if(!sceneDesc.cpuDispatcher)
@@ -239,6 +259,7 @@ namespace PhysicsEngine
 		if (!px_scene)
 			throw new Exception("PhysicsEngine::Scene::Init, Could not initialise the scene.");
 
+		//default gravity
 		px_scene->setGravity(PxVec3(0.0f, -9.81f, 0.0f));
 
 		CustomInit();
@@ -248,6 +269,8 @@ namespace PhysicsEngine
 		selected_actor = 0;
 
 		SelectNextActor();
+		SelectActor(2);
+		selected_actor->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 	}
 
 	void Scene::Update(PxReal dt)
@@ -292,6 +315,19 @@ namespace PhysicsEngine
 		return selected_actor;
 	}
 
+	// custom select
+	void Scene::SelectActor(int index)
+	{
+		std::vector<PxRigidDynamic*> actors(px_scene->getNbActors(PxActorTypeSelectionFlag::eRIGID_DYNAMIC));
+		if (actors.size() && (px_scene->getActors(PxActorTypeSelectionFlag::eRIGID_DYNAMIC, (PxActor**)&actors.front(), (PxU32)actors.size())))
+		{
+			if (selected_actor)
+			{
+				selected_actor = actors[index];
+			}
+		}
+	}
+
 	void Scene::SelectNextActor()
 	{
 		std::vector<PxRigidDynamic*> actors(px_scene->getNbActors(PxActorTypeSelectionFlag::eRIGID_DYNAMIC));
@@ -303,6 +339,7 @@ namespace PhysicsEngine
 					if (selected_actor == actors[i])
 					{
 						HighlightOff(selected_actor);
+						//select the next actor
 						selected_actor = actors[(i+1)%actors.size()];
 						break;
 					}
@@ -328,6 +365,7 @@ namespace PhysicsEngine
 
 	void Scene::HighlightOn(PxRigidDynamic* actor)
 	{
+		//store the original colour and adjust brightness of the selected actor
 		std::vector<PxShape*> shapes(actor->getNbShapes());
 		actor->getShapes((PxShape**)&shapes.front(), (PxU32)shapes.size());
 
@@ -343,6 +381,7 @@ namespace PhysicsEngine
 
 	void Scene::HighlightOff(PxRigidDynamic* actor)
 	{
+		//restore the original color
 		std::vector<PxShape*> shapes(actor->getNbShapes());
 		actor->getShapes((PxShape**)&shapes.front(), (PxU32)shapes.size());
 

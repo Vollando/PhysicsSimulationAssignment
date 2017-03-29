@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PhysicsEngine.h"
-#include "Actors.h"
+#include "BasicActors.h"
 #include <iostream>
 #include <iomanip>
 
@@ -57,7 +57,7 @@ namespace PhysicsEngine
 		}
 	};
 
-	/*class Dimond
+	class Dimond
 	{
 	public:
 		vector<PxVec3> verts = { PxVec3(0.5,1,0), PxVec3(0.5,1,1), PxVec3(1,0,0), PxVec3(0,0,0), PxVec3(0,0,1), PxVec3(1,0,1), 
@@ -86,7 +86,7 @@ namespace PhysicsEngine
 			verts[7].z *= l;
 			mesh = new ConvexMesh(vector<PxVec3>(begin(verts), end(verts)), pose, density);
 		}
-	};*/
+	};
 
 	class Walls : public DynamicActor
 	{
@@ -96,8 +96,8 @@ namespace PhysicsEngine
 		{
 			CreateShape(PxBoxGeometry(dimensions), density);
 			CreateShape(PxBoxGeometry(dimensions), density);
-			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, 2.0f+dimensions.x/2)), density);
-			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, 2.0f+dimensions.x/2)), density);
+			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x/2)), density);
+			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x/2)), density);
 		}
 	};
 
